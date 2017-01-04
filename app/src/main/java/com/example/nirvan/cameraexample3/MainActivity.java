@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
@@ -20,11 +21,16 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+
 public class MainActivity extends AppCompatActivity
 {
 
-
+    static int id1=1,id2=2;
     ImageView myImage;
+    EditText textVar;
+    int flag=0;             //flag==0 means place img below text, ==1 means below textVar
+
+
     private String pictureImagePath = "";
     Uri outputFileUri;
     @Override
@@ -62,25 +68,58 @@ public class MainActivity extends AppCompatActivity
     protected void onActivityResult(int requestCode, int resultCode, Intent data)
     {
         Log.d("TAG","CUSTOOOM");
+        RelativeLayout relativeLayout=(RelativeLayout) findViewById(R.id.relativeLayout);
+        myImage=new ImageView(this);
+        myImage.setId(id1++);
+     //        textVar.setId(id2++);
+
+
+
+
         if (requestCode == 1 && resultCode == RESULT_OK)
         {
             File imgFile = new File(pictureImagePath);
            if (imgFile.exists())
             {
                 Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
-                myImage = (ImageView) findViewById(R.id.imageViewTest);
+               // myImage = (ImageView) findViewById(R.id.imageViewTest);
 
-                //
-                final RelativeLayout.LayoutParams relativeParams = new RelativeLayout.LayoutParams
-                        (RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
+                //this code ensures the imageView is placed below the editText
+                RelativeLayout.LayoutParams relativeParams = new RelativeLayout.LayoutParams
+                        (RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
 
-                relativeParams.addRule(RelativeLayout.BELOW,R.id.text);
-                myImage.setLayoutParams(relativeParams);
+                if(flag==0)
+                   {
+                       relativeParams.addRule(RelativeLayout.BELOW, R.id.text);
+                       flag=1;
+                   }
+                else if(flag==1)
+                    relativeParams.addRule(RelativeLayout.BELOW, textVar.getId());
+
+
+
+
+                //myImage.setLayoutParams(relativeParams);
+                relativeLayout.addView(myImage,relativeParams);
                 //
                 myImage.setImageBitmap(myBitmap);
 
+
+                //place the new editText below the imgaeView just placed
+                relativeParams = new RelativeLayout.LayoutParams
+                        (RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);                            //<--
+                relativeParams.addRule(RelativeLayout.BELOW, myImage.getId());
+                textVar=new EditText(this);
+                textVar.setId(id2++);
+
+                relativeLayout.addView(textVar,relativeParams);
+                textVar.setText("NEW");
+
+
+
+
             }
-        }
+        }//
 
 
 
